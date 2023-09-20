@@ -1,47 +1,32 @@
 import os
-from send2trash import send2trash
+import shutil
 
-def find_empty_folders(path):
-    empty_folders = []
-    for folder_name, subfolders, filenames in os.walk(path, topdown=False):
-        for subfolder in subfolders:
-            folder_path = os.path.join(folder_name, subfolder)
-            if not os.listdir(folder_path):  # 檢查文件夾是否為空
-                empty_folders.append(folder_path)
-    return empty_folders
+# 获取当前目录
+current_directory = os.getcwd()
 
-def write_to_log(empty_folders, log_file):
-    with open(log_file, 'w', encoding='utf-8') as f:
-        f.write("以下是需要移入回收站的空文件夾列表：\n")
-        for folder in empty_folders:
-            f.write(folder + '\n')
+# 查找空文件夹并将路径写入日志
+empty_folders = []
+for foldername, subfolders, filenames in os.walk(current_directory, topdown=False):
+    if not subfolders and not filenames:
+        empty_folders.append(foldername)
 
-def main():
-    current_directory = os.getcwd()  # 獲取當前腳本所在的文件夾路徑
-    empty_folders = find_empty_folders(current_directory)
-
-    if not empty_folders:
-        print("沒有空文件夾需要處理。")
-        input()
-        return
-
-    log_file = "empty_folders_log.txt"
-    write_to_log(empty_folders, log_file)
-
-    print(f"已將需要移入回收站的空文件夾列表寫入日誌文件：{log_file}")
-    print("以下是需要移入回收站的空文件夾列表：")
+# 将空文件夹路径写入日志文件
+log_file = "empty_folders_log.txt"
+with open(log_file, "w") as f:
     for folder in empty_folders:
-        print(folder)
+        f.write(folder + "\n")
 
-    confirmation = input("是否要移入回收站上述空文件夾？ (y/n): ")
-    if confirmation.lower() == 'y':
-        for folder in empty_folders:
-            try:
-                print(f"正在移入回收站文件夾：{folder}")
-                send2trash(folder)  # 將空文件夾移入回收站
-                open_log_file(log_file)
-            except Exception as e:
-                print(f"無法移入回收站文件夾 {folder}: {str(e)}")
+# 询问用户是否移入回收站
+response = input("是否将这些空文件夹移到回收站？(y/n): ").strip().lower()
 
-if __name__ == "__main__":
-    main()
+if response == "y":
+    # 移入回收站
+    for folder in empty_folders:
+        try:
+            shutil.rmtree(folder)
+            print(f"已将文件夹 '{folder}' 移入回收站")
+        except Exception as e:
+            print(f"移入文件夹 '{folder}' 到回收站时出错: {e}")
+
+# 程序执行完毕后等待用户输入
+input("按 Enter 键退出程序...")
