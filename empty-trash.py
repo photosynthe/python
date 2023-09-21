@@ -10,8 +10,13 @@ for foldername, subfolders, filenames in os.walk(current_directory, topdown=Fals
     if not subfolders and not filenames:
         empty_folders.append(foldername)
 
+# 获取桌面路径
+desktop_directory = os.path.expanduser("~/Desktop")
+
+# 构建日志文件路径
+log_file = os.path.join(desktop_directory, "empty_folders_log.txt")
+
 # 将空文件夹路径写入日志文件
-log_file = "empty_folders_log.txt"
 with open(log_file, "w") as f:
     for folder in empty_folders:
         f.write(folder + "\n")
