@@ -1,4 +1,5 @@
 import keyboard
+import signal
 
 # 用於跟蹤已經觸發的按鍵
 pressed_keys = set()
@@ -13,11 +14,12 @@ def on_key_event(e):
 # 註冊鍵盤事件處理函數
 keyboard.hook(on_key_event)
 
-# 保持程式運行，直到按下Ctrl + C結束
-try:
-    keyboard.wait('ctrl+c')
-except KeyboardInterrupt:
+# 定義一個處理Ctrl + C信號的函數，什麼也不做
+def handle_ctrl_c(signal, frame):
     pass
 
-# 清理
-keyboard.unhook_all()
+# 設置Ctrl + C信號處理程序
+signal.signal(signal.SIGINT, handle_ctrl_c)
+
+# 無限循環，直到手動結束程式
+keyboard.wait()
